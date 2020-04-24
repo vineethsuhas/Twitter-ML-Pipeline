@@ -1,0 +1,58 @@
+<!-- #### -->
+<!-- REF: https://www.sanwebe.com/2014/08/css-html-forms-designs -->
+<!-- #### -->
+
+{% load static %}
+
+<html>
+<head>
+    <title>Offline Loader</title>
+    <link rel="stylesheet" href="{% static 'css/loader.css' %}">
+</head>
+
+<form action="." method="post" enctype="multipart/form-data"> {% csrf_token %}
+<ul class="form-style-1">
+    <h1> CONFIGURE OFFLINE LOADER </h1>
+    <li>
+        <label>Name of Loader<span class="required">*</span></label>
+        <input type="text" name="name" class="field-long"/>
+    </li>
+    <li>
+        <label>Storage <span class="required">*</span> </label>
+        <select name="storage" class="field-select">
+        {% for opt in storage_opts %}
+            <option value="{{ opt }}">{{ opt }}</option>
+        {% endfor %}
+        </select>
+    </li>
+
+    <li>
+        <label>File Type <span class="required">*</span> </label>
+        <select name="fileType" class="field-select">
+        {% for opt in file_type_options %}
+            <option value="{{ opt }}">{{ opt }}</option>
+        {% endfor %}
+        </select>
+    </li>
+
+    <li>
+        <label>File Path <span class="required">*</span> </label>
+        <textarea name="filePath" id="filePath" class="field-long"></textarea>
+    </li>
+
+    <li>
+        <label>Schema </label>
+        <input type="file" id="schema" name="schema">
+    </li>
+
+    <li>
+        <label>Mapping </label>
+        <input type="file" id="mapping" name="mapping">
+    </li>
+
+    <li>
+        <input type="submit" value="Submit" />
+    </li>
+
+</ul>
+</form>

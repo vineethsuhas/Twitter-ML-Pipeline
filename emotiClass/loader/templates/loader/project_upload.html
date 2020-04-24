@@ -1,0 +1,40 @@
+<!-- #### -->
+<!-- REF: https://www.sanwebe.com/2014/08/css-html-forms-designs -->
+<!-- #### -->
+
+{% load static %}
+
+<html>
+<head>
+    <title>Project Uploads</title>
+    <link rel="stylesheet" href="{% static 'css/loader.css' %}">
+</head>
+
+<form action="." method="post" enctype="multipart/form-data"> {% csrf_token %}
+<ul class="form-style-1">
+    <h1> Project Uploads </h1>
+    <li>
+        <label>Select Project <span class="required">*</span> </label>
+        <select name="project" class="field-select">
+        {% for opt in project_opts %}
+            <option value="{{ opt }}">{{ opt }}</option>
+        {% endfor %}
+        </select>
+    </li>
+
+    <li>
+        <label>Offline Data File </label>
+        <input type="file" id="data" name="data">
+    </li>
+
+    <li>
+        <label>Twitter Tracks </label>
+        <textarea name="tracks" id="tracks" class="field-long"></textarea>
+    </li>
+
+    <li>
+        <input type="submit" value="Submit" />
+    </li>
+
+</ul>
+</form>

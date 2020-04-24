@@ -1,0 +1,11 @@
+.*
+!/.gitignore
+*/__pycache__/
+*/*/__pycache__/
+*/*/*/__pycache__/
+emotiClass/emotiClass/config/*.py
+logs/
+media/data/*
+media/uploads/*
+!media/data/sample_*
+!media/uploads/sample_*

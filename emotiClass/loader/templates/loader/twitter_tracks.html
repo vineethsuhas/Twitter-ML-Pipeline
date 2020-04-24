@@ -1,0 +1,32 @@
+<!-- #### -->
+<!-- REF: https://www.sanwebe.com/2014/08/css-html-forms-designs -->
+<!-- #### -->
+
+{% load static %}
+
+<html>
+<head>
+    <title>Twitter Tracks</title>
+    <link rel="stylesheet" href="{% static 'css/loader.css' %}">
+</head>
+
+<form action="." method="post" enctype="multipart/form-data"> {% csrf_token %}
+<ul class="form-style-1">
+    <h1> CONFIGURE TWITTER TRACKS </h1>
+    <li>
+        <label>Name of Tracker<span class="required">*</span></label>
+        <input type="text" name="name" class="field-long"/>
+    </li>
+
+    <li>
+        <label>Twitter Tracks <span class="required">*</span> </label>
+        <textarea name="tracks" id="tracks" class="field-long"></textarea>
+        <div> Comma Separated List of Twitter Tracks. EX: "Coronavirus, Covid-19" </div>
+    </li>
+
+    <li>
+        <input type="submit" value="Submit" />
+    </li>
+
+</ul>
+</form>
