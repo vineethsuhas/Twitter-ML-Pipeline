@@ -9,20 +9,22 @@ RUN apt-get clean && apt-get update && apt-get install -y --no-install-recommend
     python-gdal \
     python3-dev \
     software-properties-common \
-    unzip
+    unzip \
+    wget \
+    telnet \
+
 
 WORKDIR /emotion_classification
-RUN mkdir emotiClass
-COPY . /emotion_classification/emotiClass/
-
-CMD [ "/bin/bash" ]
+RUN mkdir Twitter-ML-Pipeline
+COPY . /emotion_classification/Twitter-ML-Pipeline/
 
 RUN /usr/bin/python3 -m venv --without-pip /emotion_classification/ec_venv \
     && curl https://bootstrap.pypa.io/get-pip.py -o /emotion_classification/ec_venv/get-pip.py \
-    && /emotion_classification/ec_venv/bin/python3 /emotion_classification/ec_venv/get-pip.py
-#    && /emotion_classification/ec_venv/bin/pip install --no-binary django -r emotiClass/emotiClass/requirements.txt
-
-COPY 
+    && /emotion_classification/ec_venv/bin/python3 /emotion_classification/ec_venv/get-pip.py \
+    && /emotion_classification/ec_venv/bin/pip install -r /emotion_classification/Twitter-ML-Pipeline/emotiClass/emotiClass/requirements.txt
 
 EXPOSE 8080
-CMD [ "ec_venv/bin/python", "emotiClass/manage.py", "runserver",  "8080" ]
+CMD [ "/emotion_classification/ec_venv/bin/python", \
+      "/emotion_classification/Twitter-ML-Pipeline/emotiClass/manage.py", \
+      "runserver",  \
+      "0.0.0.0:8080" ]
