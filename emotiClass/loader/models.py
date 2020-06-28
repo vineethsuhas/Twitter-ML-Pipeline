@@ -83,8 +83,8 @@ class Project(models.Model):
         return self.name
 
 
-@receiver(post_save, sender=Project, dispatch_uid="update_stock_count")
-def update_stock(sender, instance, **kwargs):
+@receiver(post_save, sender=Project, dispatch_uid="run_process")
+def run_process(sender, instance, **kwargs):
     project_name = instance.name
 
     DEVNULL = open(settings.EC_LOG_FILE, 'wb')

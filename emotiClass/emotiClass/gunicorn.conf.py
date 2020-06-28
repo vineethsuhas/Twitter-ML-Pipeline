@@ -38,4 +38,3 @@ keepalive = 5
 preload_app = False
 loglevel = "debug"
 name = 'gunicorn_django'
-

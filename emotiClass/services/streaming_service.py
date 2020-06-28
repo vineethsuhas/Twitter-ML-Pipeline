@@ -1,8 +1,18 @@
 """
+Title: Streaming Service
+Author: Vineeth Suhas Challagali (vsc5068)
+Code Version: v1.0.0
+Description:
+    Streams the data from the Twitter using Twitter API's and pushes them to Kafka topic.
+    The topic name is dynamic based on the project name.
+"""
 
+"""
+Resouces:
 # curl -X PUT "localhost:9200/online_index/_settings?pretty" -H 'Content-Type: application/json' -d'{"index" : {"mapping.total_fields.limit": 2000}}'
 /Users/vineethsuhas/vineeth/handsOn/mpsDaan/indepStudy/temp/bin/python /Users/vineethsuhas/vineeth/handsOn/mpsDaan/indepStudy/v1.0.0/streaming_service.py -t="corona,covid19"
 """
+
 import os
 import sys
 import argparse
@@ -128,10 +138,12 @@ if __name__ == '__main__':
     if debug:
         IS_TEST_ENV = True
         TWITTER_KAFKA_TOPIC = "test_twitter_stream"
+        kafka_topic = "test_twitter_stream"
+    else:
+        kafka_topic = settings.TWITTER_KAFKA_TOPIC_PREFIX + project
 
     if project:
         prj_tracks = TwitterTracks.objects.get(project_twittertracks__name=project).search_terms
         tracks += prj_tracks
 
-    kafka_topic = settings.TWITTER_KAFKA_TOPIC_PREFIX + project
     publish_tweets(tracks)

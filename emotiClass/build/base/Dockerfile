@@ -1,4 +1,5 @@
 FROM ubuntu:16.04
+#FROM java:8
 
 RUN apt-get clean && apt-get update && apt-get install -y --no-install-recommends binutils \
     build-essential \

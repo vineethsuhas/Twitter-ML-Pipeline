@@ -1,10 +1,12 @@
 """
-Historical Data available in the form of files.
-
-This process performs the following operations:
-
-    1. Loads the data into the raw data store
-    2. Classifies the emotion for tweets and pushes them to elasticsearch.
+Title: Offline Classifier
+Author: Vineeth Suhas Challagali (vsc5068)
+Code Version: v1.0.0
+Description:
+    Emotion Classification of historical data available in the form of CSV.
+    This process performs the following operations:
+        1. Loads the raw data(CSV) into the Elasticsearch raw index.
+        2. Classifies the emotion for each row (tweet text) and pushes them to Elasticsearch offline emotions index.
 """
 import os
 import sys

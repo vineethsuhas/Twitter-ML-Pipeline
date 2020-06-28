@@ -1,3 +1,11 @@
+"""
+Title: Online Loader
+Author: Vineeth Suhas Challagali (vsc5068)
+Code Version: v1.0.0
+Description:
+    Connects to the Kafka topic based on the project name and loads the data into the raw Elasticsearch index.
+"""
+
 import os
 import sys
 import json

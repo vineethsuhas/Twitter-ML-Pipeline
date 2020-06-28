@@ -1,3 +1,12 @@
+"""
+Title: Online Classifier
+Author: Vineeth Suhas Challagali (vsc5068)
+Code Version: v1.0.0
+Description:
+    A spark application which connects to the Kafka topic and classifies the emotions of the text of each message.
+    The emotions are loaded into the Elasticsearch emotions index.
+"""
+
 import os
 import sys
 import glob
