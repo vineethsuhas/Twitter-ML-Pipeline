@@ -157,6 +157,7 @@ TWITTER_KAFKA_TOPIC_PREFIX = "tweets_"
 ES_IDX_OFFLINE_RAW_PREFIX = 'raw_offline_'
 ES_IDX_ONLINE_RAW_PREFIX = 'raw_online_'
 ES_IDX_EMOTIONS_PREFIX = 'emotions_'
+ES_IDX_TOPIC_EMOTIONS = 'topic_emotions_'
 
 EC_LOG = 'ec_log'
 EC_LOG_FILE = os.path.join(LOGS_DIR, "ec.log")

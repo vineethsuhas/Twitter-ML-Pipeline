@@ -19,49 +19,81 @@ app_basename = os.path.basename(APP_DIR)
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', app_basename + '.settings')
 django.setup()
 
-from tqdm import tqdm
-import pandas as pd
 from django.conf import settings
 
-import elasticsearch
+from loader.models import OfflineLoader
+
+from services.utils import _thread_locals
+from services.utils import init_spark
+from services.offline_classifier import infer_file_schema
 
 
 logger = logging.getLogger(settings.EC_LOG)
 
 
-def get_file_path(existing_path=None):
-    if existing_path:
-        path = existing_path
-    else:
-        path = os.path.join(settings.MEDIA_DIR, 'data', 'topic_modeled_tweets', 'tweets_with_topics.csv')
-
-    logger.info("The path of the file is %s".format(path))
-    return path
+def get_file_path(project_name):
+    file_path = OfflineLoader.objects.get(project_offlineloader__name=project_name).file_path
+    return file_path
 
 
-def load_offline_data(path):
-    data_path = get_file_path(path)
+def write_to_es(doc, prj_name):
+    from elasticsearch import Elasticsearch
 
-    emotions = pd.read_csv(data_path, index_col=0)
+    es = Elasticsearch()
+    doc_dict = doc.asDict()
 
-    es = elasticsearch.Elasticsearch()
+    es_idx = settings.ES_IDX_TOPIC_EMOTIONS + prj_name
+    es.index(es_idx, doc_dict, id=doc_dict["X"])
 
-    # Load the data into the Elasticsearch
-    for i, row in tqdm(enumerate(emotions.iterrows())):
-        # for i, row in enumerate(dat.iterrows()):
-        row_dict = row[1].to_dict()
-        es.index("topic_modeled_emotions_new", row_dict, id=row_dict['X'])
+
+def consume_files(project_name):
+    file_path = get_file_path(project_name)
+    static_schema = infer_file_schema(project_name)
+
+    mapping = OfflineLoader.objects.get(project_offlineloader__name=project_name).field_mappings
+    tweet_id_key = mapping.get('id', 'id')
+    setattr(sys.modules['__main__'], 'TWEET_ID_KEY', tweet_id_key)
+
+    SPARK_SESSION = getattr(_thread_locals, 'SPARK_SESSION')
+    stream_df = SPARK_SESSION\
+        .readStream\
+        .schema(static_schema)\
+        .format("csv")\
+        .option("maxFilesPerTrigger", 1)\
+        .option('multiline', 'true')\
+        .option("header", "true")\
+        .option('quote', '"')\
+        .option('delimiter', ',')\
+        .option('escape', '"')\
+        .load(file_path + "/*.csv")
+
+    # Write the Data to ElasticSearch using forEach sink
+    writer_query = stream_df \
+        .writeStream \
+        .foreach(lambda x: write_to_es(x, project_name)) \
+        .start()
+
+    # Write the query ID to console for reference.
+    logger.debug("Writer Query Invoked with ID: {0}".format(writer_query.id))
+
+    # Await for completion
+    writer_query.awaitTermination()
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-p',
-                        '--path',
+                        '--project',
                         type=str,
-                        help='Path to load the data from',
+                        help='Project for which upload has to be invoked',
                         default=False,
-                        required=False)
-    import ipdb; ipdb.set_trace()
+                        required=True)
+
     args = parser.parse_args()
-    path = args.path
-    load_offline_data(path)
+    project_name = args.project
+
+    # Init spark session
+    init_spark()
+
+    # Start consuming messages
+    consume_files(project_name)

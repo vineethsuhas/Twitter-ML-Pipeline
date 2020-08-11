@@ -19,17 +19,21 @@ class OfflineLoaderForm(forms.ModelForm):
 
 class ProjectForm(forms.ModelForm):
 
-    sample_offline_file = forms.FileField()
+    sample_offline_file = forms.FileField(required=False)
 
     class Meta:
-        model = models.OfflineLoader
+        model = models.Project
         fields = '__all__'
 
     def save(self, commit=True):
         instance = super(ProjectForm, self).save(commit=False)
-        upload_path = instance.offline_loader.file_path
-        file = self['sample_offline_file'].value()
-        write_to_uploads(file, folder_name=upload_path, file_name=file.name)
+
+        if instance.offline_loader:
+            upload_path = instance.offline_loader.file_path
+            file = self['sample_offline_file'].value()
+            if file:
+                write_to_uploads(file, folder_name=upload_path, file_name=file.name)
+
         if commit:
             instance.save()
         return instance

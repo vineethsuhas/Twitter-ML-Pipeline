@@ -70,8 +70,8 @@ class TwitterTracks(models.Model):
 
 class Project(models.Model):
     name = models.CharField(max_length=200)
-    offline_loader = models.ForeignKey(OfflineLoader, related_name='project_offlineloader', null=True)
-    twitter_tracker = models.ForeignKey(TwitterTracks, related_name='project_twittertracks', null=True)
+    offline_loader = models.ForeignKey(OfflineLoader, related_name='project_offlineloader', null=True, blank=True)
+    twitter_tracker = models.ForeignKey(TwitterTracks, related_name='project_twittertracks', null=True, blank=True)
     created_date = models.DateTimeField(default=datetime.datetime.now, editable=False)
     updated_date = models.DateTimeField(default=datetime.datetime.now, editable=False)
 
@@ -94,26 +94,17 @@ def run_process(sender, instance, **kwargs):
     os.environ["PYSPARK_PYTHON"] = py_path
     os.environ["PYSPARK_DRIVER_PYTHON"] = py_path
 
-    # Invoke the offline classifier.
-    subprocess.Popen([py_path,
-                      os.path.abspath(os.path.join(settings.BASE_DIR, "services/offline_classifier.py")),
-                      "-p",
-                      project_name], shell=False, stdout=DEVNULL, stderr=DEVNULL)
+    all_jobs = []
 
-    # Invoke the streaming service
-    subprocess.Popen([py_path,
-                      os.path.abspath(os.path.join(settings.BASE_DIR, "services/streaming_service.py")),
-                      "-p",
-                      project_name], shell=False, stdout=DEVNULL, stderr=DEVNULL)
+    if instance.offline_loader:
+        all_jobs += [j.name + ".py" for j in instance.offline_loader.job.all()]
 
-    # Invoke the online loader
-    subprocess.Popen([py_path,
-                      os.path.abspath(os.path.join(settings.BASE_DIR, "services/online_loader.py")),
-                      "-p",
-                      project_name], shell=False, stdout=DEVNULL, stderr=DEVNULL)
+    if instance.twitter_tracker:
+        all_jobs += [j.name + ".py" for j in instance.twitter_tracker.job.all()]
 
-    # Invoke the online classifier
-    subprocess.Popen([py_path,
-                      os.path.abspath(os.path.join(settings.BASE_DIR, "services/online_classifier.py")),
-                      "-p",
-                      project_name], shell=False, stdout=DEVNULL, stderr=DEVNULL)
+    # Invoke all the required jobs:
+    for job in all_jobs:
+        subprocess.Popen([py_path,
+                          os.path.abspath(os.path.join(settings.BASE_DIR, "services", job)),
+                          "-p",
+                          project_name], shell=False, stdout=DEVNULL, stderr=DEVNULL)

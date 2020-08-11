@@ -33,12 +33,18 @@ class ProjectAdmin(admin.ModelAdmin):
     )
 
     def offline_loader_ref(self, obj):
-        link = urlresolvers.reverse("admin:loader_offlineloader_change", args=[obj.offline_loader.id])
-        return u'<a href="%s">%s</a>' % (link, obj.offline_loader.name)
+        if obj.offline_loader:
+            link = urlresolvers.reverse("admin:loader_offlineloader_change", args=[obj.offline_loader.id])
+            return u'<a href="%s">%s</a>' % (link, obj.offline_loader.name)
+        else:
+            return ""
 
     def twitter_tracker_ref(self, obj):
-        link = urlresolvers.reverse("admin:loader_twittertracks_change", args=[obj.twitter_tracker.id])
-        return u'<a href="%s">%s</a>' % (link, obj.twitter_tracker.name)
+        if obj.twitter_tracker:
+            link = urlresolvers.reverse("admin:loader_twittertracks_change", args=[obj.twitter_tracker.id])
+            return u'<a href="%s">%s</a>' % (link, obj.twitter_tracker.name)
+        else:
+            return ""
 
     offline_loader_ref.allow_tags = True
     twitter_tracker_ref.allow_tags = True
